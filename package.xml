@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package>
-  <name>pho_driver</name>
+  <name>phoxi_camera</name>
   <version>0.0.0</version>
-  <description>The pho_driver package</description>
+  <description>The phoxi_camera package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag --> 
   <!-- Example:  -->

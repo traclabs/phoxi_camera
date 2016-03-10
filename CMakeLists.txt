@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(pho_driver)
+project(phoxi_camera)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -97,7 +97,7 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 generate_dynamic_reconfigure_options(
-        cfg/pho_driver.cfg
+        cfg/phoxi_camera.cfg
 )
 
 ###################################
@@ -163,20 +163,20 @@ include_directories(
 ## Declare a C++ executable
 # add_executable(pho_driver_node src/pho_driver_node.cpp)
 
-add_executable(pho_driver_node src/pho_driver_node.cpp)
+add_executable(phoxi_camera_node src/phoxi_camera_node.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(pho_driver_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-add_dependencies(pho_driver_node ${PROJECT_NAME}_gencfg)
+add_dependencies(phoxi_camera_node ${PROJECT_NAME}_gencfg)
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(pho_driver_node
 #   ${catkin_LIBRARIES}
 # )
 
-target_link_libraries(pho_driver_node
+target_link_libraries(phoxi_camera_node
         debug ${catkin_LIBRARIES}
         optimized ${catkin_LIBRARIES}
         debug /home/msladek/PhoOutput/PhoXi_API/libPhoXi_API_Debug.so
