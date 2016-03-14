@@ -131,6 +131,9 @@ add_compile_options(-pthread)
 ## Your package locations should be listed before other locations
 # include_directories(include)
 #set(BOOST_ROOT /home/msladek/3rdParty_REPO/boost_1_60_0)
+find_package(PhoXi REQUIRED CONFIG PATHS /usr/local/PhoXiControl)
+
+
 FIND_PACKAGE(Boost REQUIRED COMPONENTS
         system
         filesystem
@@ -146,8 +149,7 @@ FIND_PACKAGE(Boost REQUIRED COMPONENTS
 
 include_directories(
   ${catkin_INCLUDE_DIRS}
-    /home/msladek/PhotoneoMain_REPO/NewPhoXiAPI
-    /home/msladek/PhotoneoMain_REPO/NewPhoXiAPI/PhoXi_API
+  ${PHOXI_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -179,8 +181,7 @@ add_dependencies(phoxi_camera_node ${PROJECT_NAME}_gencfg)
 target_link_libraries(phoxi_camera_node
         debug ${catkin_LIBRARIES}
         optimized ${catkin_LIBRARIES}
-        debug /home/msladek/PhoOutput/PhoXi_API/libPhoXi_API_Debug.so
-        optimized /home/msladek/PhoOutput/PhoXi_API/libPhoXi_API_Release.so
+        ${PHOXI_LIBRARY}
         debug ${Boost_LIBRARIES}
         optimized ${Boost_LIBRARIES}
         rt
