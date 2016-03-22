@@ -178,6 +178,7 @@ add_dependencies(phoxi_camera_node ${PROJECT_NAME}_gencfg)
 #   ${catkin_LIBRARIES}
 # )
 
+#message(${PHOXI_LIBRARY})
 target_link_libraries(phoxi_camera_node
         debug ${catkin_LIBRARIES}
         optimized ${catkin_LIBRARIES}
