@@ -3,12 +3,15 @@
 #include <dynamic_reconfigure/server.h>
 #include <phoxi_camera/TutorialsConfig.h>
 #include <sensor_msgs/PointCloud2.h>
+#include <phoxi_camera/PhoXiSize.h>
 #include <std_srvs/Empty.h>
 #include <phoxi_camera/GetDeviceList.h>
 #include <phoxi_camera/ConnectCamera.h>
 #include <phoxi_camera/IsAcquiring.h>
 #include <phoxi_camera/TriggerImage.h>
 #include <phoxi_camera/GetFrame.h>
+#include <phoxi_camera/GetHardwareIdentification.h>
+#include <phoxi_camera/GetSupportedCapturingModes.h>
 
 //#define PHOXI_PCL_SUPPORT
 
@@ -151,9 +154,17 @@ bool connect_camera(phoxi_camera::ConnectCamera::Request &req,
             }
         }
     }
+    init_config(EvaluationScanner);
     res.success = false;
     return true;
 }
+
+bool disconnect_camera(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res) {
+    EvaluationScanner->Disconnect();
+    return true;
+}
+
+
 
 bool is_acquiring(phoxi_camera::IsAcquiring::Request &req, phoxi_camera::IsAcquiring::Response &res) {
     if (EvaluationScanner->isAcquiring()) {
@@ -161,6 +172,11 @@ bool is_acquiring(phoxi_camera::IsAcquiring::Request &req, phoxi_camera::IsAcqui
         return true;
     }
     res.is = false;
+    return true;
+}
+
+bool start_acquisition(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res) {
+    EvaluationScanner->StartAcquisition();
     return true;
 }
 
@@ -178,9 +194,7 @@ bool trigger_image(phoxi_camera::TriggerImage::Request &req, phoxi_camera::Trigg
 }
 
 void publish_frame(pho::api::PFrame MyFrame){
-//    EvaluationScanner->AcquisitionTime = 1.0;
     if (MyFrame) {
-//        std::cout << i << std::endl;
         if (!MyFrame->PointCloud.Empty())
             std::cout << "PointCloud: " << MyFrame->PointCloud.Size.Width << " x " <<
             MyFrame->PointCloud.Size.Height << " Type: " <<
@@ -226,10 +240,26 @@ void publish_frame(pho::api::PFrame MyFrame){
 bool get_frame(phoxi_camera::GetFrame::Request &req, phoxi_camera::GetFrame::Response &res){
     pho::api::PFrame MyFrame = EvaluationScanner->GetFrame(req.in);
     if(MyFrame){
-        //publish_frame(MyFrame);
+        publish_frame(MyFrame);
         res.success = true;
     }
     else res.success = false;
+    return true;
+}
+
+bool get_supported_capturing_modes(phoxi_camera::GetSupportedCapturingModes::Request &req, phoxi_camera::GetSupportedCapturingModes::Response &res){
+    std::vector<pho::api::PhoXiCapturingMode> vec = EvaluationScanner->SupportedCapturingModes;
+    for(int i = 0;i< vec.size();i++){
+        phoxi_camera::PhoXiSize a;
+        a.Width = vec[i].Resolution.Width;
+        a.Height = vec[i].Resolution.Height;
+        res.supported_capturing_modes.push_back(a);
+    }
+    return true;
+}
+
+bool get_hardware_identification(phoxi_camera::GetHardwareIdentification::Request &req, phoxi_camera::GetHardwareIdentification::Response &res){
+    res.hardware_identification = EvaluationScanner->HardwareIdentification;
     return true;
 }
 
@@ -240,22 +270,24 @@ int main(int argc, char **argv) {
 
     dynamic_reconfigure::Server <phoxi_camera::TutorialsConfig> server;
     dynamic_reconfigure::Server<phoxi_camera::TutorialsConfig>::CallbackType f;
-//    f = boost::bind(&callback, boost::ref(EvaluationScanner), _1, _2);
-//    server.setCallback(f);
-//    ros::AsyncSpinner spinner(4); // Use 4 threads
-//    spinner.start();
+    f = boost::bind(&callback, boost::ref(EvaluationScanner), _1, _2);
+    server.setCallback(f);
     ros::ServiceServer service_get_device_list = nh.advertiseService("get_device_list", get_device_list_service);
     ros::ServiceServer service_connect_camera = nh.advertiseService("connect_camera", connect_camera);
     ros::ServiceServer service_is_acquiring = nh.advertiseService("is_acquiring", is_acquiring);
+    ros::ServiceServer service_start_acquisition = nh.advertiseService("start_acquisition", start_acquisition);
     ros::ServiceServer service_stop_acquisition = nh.advertiseService("stop_acquisition", stop_acquisition);
     ros::ServiceServer service_trigger_image = nh.advertiseService("trigger_image", trigger_image);
     ros::ServiceServer service_get_frame = nh.advertiseService("get_frame", get_frame);
+    ros::ServiceServer service_disconnect_camera = nh.advertiseService("disconnect_camera", disconnect_camera);
+    ros::ServiceServer service_get_hardware_identification = nh.advertiseService("get_hardware_indentification", get_hardware_identification);
+    ros::ServiceServer service_get_supported_capturing_modes = nh.advertiseService("get_supported_capturing_modes", get_supported_capturing_modes);
     ROS_INFO("Ready");
 //    f = boost::bind(&callback, _1, _2);
 //    server.setCallback(f);
     //LOCAL_CROSS_SLEEP(5000);
     pub = nh.advertise < pcl::PointCloud < pcl::PointXYZ >> ("output", 1);
-    int k = 0;
+//    int k = 0;
     ros::spin();
     while (ros::ok()) {
         ROS_INFO("Spin loop");

@@ -50,15 +50,14 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
+ add_message_files(
+   FILES
+   PhoXiSize.msg
+ )
 
 ## Generate services in the 'srv' folder
  add_service_files(
-   FILES GetDeviceList.srv ConnectCamera.srv IsAcquiring.srv GetFrame.srv TriggerImage.srv
+   FILES GetDeviceList.srv ConnectCamera.srv IsAcquiring.srv GetFrame.srv TriggerImage.srv GetHardwareIdentification.srv GetSupportedCapturingModes.srv
  )
 
 ## Generate actions in the 'action' folder
