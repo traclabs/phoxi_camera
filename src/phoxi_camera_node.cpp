@@ -3,7 +3,8 @@
 #include <dynamic_reconfigure/server.h>
 #include <phoxi_camera/TutorialsConfig.h>
 #include <sensor_msgs/PointCloud2.h>
-#include <phoxi_camera/AddTwoInts.h>
+#include <phoxi_camera/GetDeviceList.h>
+#include <vector>
 
 //#define PHOXI_PCL_SUPPORT
 
@@ -101,21 +102,23 @@ void callback(pho::api::PPhoXi &Scanner, phoxi_camera::TutorialsConfig &config, 
 //    }
 
 }
-int q;
-bool add(std_srvs::Empty::Request &req,
-          phoxi_camera::AddTwoInts::Response &res){
-//   res.sum = req.a + req.b + q;
-   q += 1;
-    res.sum = q;
-//     ROS_INFO("request: x=%ld, y=%ld", (long int)req.a, (long int)req.b);
-   ROS_INFO("sending back response: [%ld]", (long int)res.sum);
-   return true;
+
+bool get_device_list(phoxi_camera::GetDeviceList::Request &req,
+         phoxi_camera::GetDeviceList::Response &res) {
+    pho::api::PhoXiFactory Factory;
+    Factory.StartConsoleOutput("Admin-On");
+    std::vector <pho::api::PhoXiDeviceInformation> DeviceList = Factory.GetDeviceList();
+    res.len = DeviceList.size();
+    std::cout << "dlzka " << DeviceList.size() << std::endl;
+    for (int i = 0; i < DeviceList.size(); ++i) {
+        res.out.push_back(DeviceList[i].HWIdentification);
+    }
+    return true;
 }
 
 int main(int argc, char **argv) {
     ROS_INFO("Starting pho_driver ros...");
     ros::init(argc, argv, "phoxi_camera");
-    q = 1;
     ros::NodeHandle nh;
     ros::Publisher pub;
 
@@ -123,8 +126,8 @@ int main(int argc, char **argv) {
     dynamic_reconfigure::Server<phoxi_camera::TutorialsConfig>::CallbackType f;
 //    ros::AsyncSpinner spinner(4); // Use 4 threads
 //    spinner.start();
-    ros::ServiceServer service = nh.advertiseService("add_two_ints", add);
-    ROS_INFO("Ready to add two ints.");
+    ros::ServiceServer service_get_device_list = nh.advertiseService("get_device_list", get_device_list);
+    ROS_INFO("Ready");
     ros::spin();
 //    f = boost::bind(&callback, _1, _2);
 //    server.setCallback(f);
@@ -133,8 +136,6 @@ int main(int argc, char **argv) {
     int k = 0;
     while (ros::ok()) {
         ROS_INFO("Spin loop");
-//        LOCAL_CROSS_SLEEP(5000);
-//        continue;
         LOCAL_CROSS_SLEEP(1000);
         pho::api::PhoXiFactory Factory;
         Factory.StartConsoleOutput("Admin-On");

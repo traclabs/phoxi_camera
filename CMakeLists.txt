@@ -58,7 +58,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 ## Generate services in the 'srv' folder
  add_service_files(
-   FILES AddTwoInts.srv
+   FILES AddTwoInts.srv GetDeviceList.srv
  )
 
 ## Generate actions in the 'action' folder
@@ -109,7 +109,8 @@ generate_dynamic_reconfigure_options(
 ## DEPENDS: system dependencies of this project that dependent projects also need
 
 catkin_package(
-#  INCLUDE_DIRS include
+        CATKIN_DEPENDS message_runtime std_msgs sensor_msgs
+        #  INCLUDE_DIRS include
 #  LIBRARIES pho_driver
 #  CATKIN_DEPENDS dynamic_reconfigure pcl_ros roscpp roslib rospy sensor_msgs std_msgs tf
 #  DEPENDS system_lib
