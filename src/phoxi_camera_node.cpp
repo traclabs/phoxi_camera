@@ -3,6 +3,7 @@
 #include <dynamic_reconfigure/server.h>
 #include <phoxi_camera/TutorialsConfig.h>
 #include <sensor_msgs/PointCloud2.h>
+#include <phoxi_camera/AddTwoInts.h>
 
 //#define PHOXI_PCL_SUPPORT
 
@@ -100,18 +101,31 @@ void callback(pho::api::PPhoXi &Scanner, phoxi_camera::TutorialsConfig &config, 
 //    }
 
 }
+int q;
+bool add(std_srvs::Empty::Request &req,
+          phoxi_camera::AddTwoInts::Response &res){
+//   res.sum = req.a + req.b + q;
+   q += 1;
+    res.sum = q;
+//     ROS_INFO("request: x=%ld, y=%ld", (long int)req.a, (long int)req.b);
+   ROS_INFO("sending back response: [%ld]", (long int)res.sum);
+   return true;
+}
 
 int main(int argc, char **argv) {
     ROS_INFO("Starting pho_driver ros...");
     ros::init(argc, argv, "phoxi_camera");
-
+    q = 1;
     ros::NodeHandle nh;
     ros::Publisher pub;
 
     dynamic_reconfigure::Server <phoxi_camera::TutorialsConfig> server;
     dynamic_reconfigure::Server<phoxi_camera::TutorialsConfig>::CallbackType f;
-    ros::AsyncSpinner spinner(4); // Use 4 threads
-    spinner.start();
+//    ros::AsyncSpinner spinner(4); // Use 4 threads
+//    spinner.start();
+    ros::ServiceServer service = nh.advertiseService("add_two_ints", add);
+    ROS_INFO("Ready to add two ints.");
+    ros::spin();
 //    f = boost::bind(&callback, _1, _2);
 //    server.setCallback(f);
     //LOCAL_CROSS_SLEEP(5000);
