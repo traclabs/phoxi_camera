@@ -3,13 +3,19 @@
 #include <dynamic_reconfigure/server.h>
 #include <phoxi_camera/TutorialsConfig.h>
 #include <sensor_msgs/PointCloud2.h>
+#include <std_srvs/Empty.h>
 #include <phoxi_camera/GetDeviceList.h>
-#include <vector>
+#include <phoxi_camera/ConnectCamera.h>
+#include <phoxi_camera/IsAcquiring.h>
+#include <phoxi_camera/TriggerImage.h>
+#include <phoxi_camera/GetFrame.h>
 
 //#define PHOXI_PCL_SUPPORT
 
 #include "PhoXi.h"
 #include <string>
+#include <vector>
+#include <iostream>
 
 #if defined(_WIN32)
 #include <windows.h>
@@ -17,7 +23,6 @@
 #include <unistd.h>
 #endif
 
-#include <iostream>
 
 #if defined(_WIN32)
 #define LOCAL_CROSS_SLEEP(Millis) Sleep(Millis)
@@ -35,6 +40,10 @@
 #include <pcl/PCLPointCloud2.h>
 #include <opencv2/opencv.hpp>
 //#include "Console/PhotoneoConsole.h"
+
+pho::api::PPhoXi EvaluationScanner;
+pho::api::PhoXiFactory Factory;
+ros::Publisher pub;
 
 void init_config(pho::api::PPhoXi &Scanner) {
     std::cout << "cinit" << std::endl;
@@ -55,6 +64,10 @@ void init_config(pho::api::PPhoXi &Scanner) {
 
 void callback(pho::api::PPhoXi &Scanner, phoxi_camera::TutorialsConfig &config, uint32_t level) {
 //void callback(phoxi_camera::TutorialsConfig &config, uint32_t level) {
+    std::cout << EvaluationScanner << std::endl;
+    if (EvaluationScanner == 0){
+        return;
+    }
     printf("%s%d%s", "\033[", 31, "m");
     std::cout << "level " << level << std::endl;
     std::bitset<32> x(level);
@@ -103,11 +116,15 @@ void callback(pho::api::PPhoXi &Scanner, phoxi_camera::TutorialsConfig &config, 
 
 }
 
-bool get_device_list(phoxi_camera::GetDeviceList::Request &req,
-         phoxi_camera::GetDeviceList::Response &res) {
-    pho::api::PhoXiFactory Factory;
+std::vector<pho::api::PhoXiDeviceInformation> get_device_list(){
+//    pho::api::PhoXiFactory Factory;
     Factory.StartConsoleOutput("Admin-On");
-    std::vector <pho::api::PhoXiDeviceInformation> DeviceList = Factory.GetDeviceList();
+    return Factory.GetDeviceList();
+}
+
+bool get_device_list_service(phoxi_camera::GetDeviceList::Request &req,
+         phoxi_camera::GetDeviceList::Response &res) {
+    std::vector <pho::api::PhoXiDeviceInformation> DeviceList = get_device_list();
     res.len = DeviceList.size();
     std::cout << "dlzka " << DeviceList.size() << std::endl;
     for (int i = 0; i < DeviceList.size(); ++i) {
@@ -116,24 +133,130 @@ bool get_device_list(phoxi_camera::GetDeviceList::Request &req,
     return true;
 }
 
+bool connect_camera(phoxi_camera::ConnectCamera::Request &req,
+                             phoxi_camera::ConnectCamera::Response &res) {
+    std::vector <pho::api::PhoXiDeviceInformation> DeviceList = get_device_list();
+    std::cout << "device list" << std::endl;
+    for (int i = 0; i < DeviceList.size(); i++) {
+        if(DeviceList[i].HWIdentification == req.name){
+            std::cout << "nasiel" << std::endl;
+            EvaluationScanner = Factory.Create(DeviceList[i]);
+            EvaluationScanner->Connect();
+            std::cout << "pripojil" << std::endl;
+            if (EvaluationScanner->isConnected()) {
+                //init_config(EvaluationScanner);
+                std::cout << "success" << std::endl;
+                res.success = true;
+                return true;
+            }
+        }
+    }
+    res.success = false;
+    return true;
+}
+
+bool is_acquiring(phoxi_camera::IsAcquiring::Request &req, phoxi_camera::IsAcquiring::Response &res) {
+    if (EvaluationScanner->isAcquiring()) {
+        res.is = true;
+        return true;
+    }
+    res.is = false;
+    return true;
+}
+
+bool stop_acquisition(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res) {
+    EvaluationScanner->StopAcquisition();
+    return true;
+}
+
+bool trigger_image(phoxi_camera::TriggerImage::Request &req, phoxi_camera::TriggerImage::Response &res){
+    if (EvaluationScanner->TriggerImage()) {
+        res.success = true;
+    }
+    else res.success = false;
+    return true;
+}
+
+void publish_frame(pho::api::PFrame MyFrame){
+//    EvaluationScanner->AcquisitionTime = 1.0;
+    if (MyFrame) {
+//        std::cout << i << std::endl;
+        if (!MyFrame->PointCloud.Empty())
+            std::cout << "PointCloud: " << MyFrame->PointCloud.Size.Width << " x " <<
+            MyFrame->PointCloud.Size.Height << " Type: " <<
+            MyFrame->PointCloud.GetElementName() << std::endl;
+        if (!MyFrame->DepthMap.Empty())
+            std::cout << "DepthMap: " << MyFrame->DepthMap.Size.Width << " x " <<
+            MyFrame->DepthMap.Size.Height << " Type: " << MyFrame->DepthMap.GetElementName() <<
+            std::endl;
+        if (!MyFrame->Texture.Empty())
+            std::cout << "Texture: " << MyFrame->Texture.Size.Width << " x " <<
+            MyFrame->Texture.Size.Height << " Type: " << MyFrame->Texture.GetElementName() <<
+            std::endl;
+        if (!MyFrame->ConfidenceMap.Empty())
+            std::cout << "ConfidenceMap: " << MyFrame->ConfidenceMap.Size.Width << " x " <<
+            MyFrame->ConfidenceMap.Size.Height << " Type: " <<
+            MyFrame->ConfidenceMap.GetElementName() << std::endl;
+        //MyFrame->SaveAsPly("Test Software" + std::to_string(k) + " , " + std::to_string(i) + ".ply");
+        //pcl::PointCloud<pcl::PointXYZRGB> MyPCLCloud;
+        //MyFrame->ConvertTo(MyPCLCloud);
+        //pcl::PCLPointCloud2 MyPCLCloud2;
+        //MyFrame->ConvertTo(MyPCLCloud2);
+        //pcl::PLYWriter Writer;
+        //Writer.writeBinary("Test Software PCL" + std::to_string(k) + " , " + std::to_string(i) + ".ply", MyPCLCloud2);
+        pcl::PointCloud <pcl::PointXYZ> cloud;
+        int h = MyFrame->PointCloud.Size.Height;
+        int w = MyFrame->PointCloud.Size.Width;
+        for (int i = 0; i < h; ++i) {
+            for (int j = 0; j < w; ++j) {
+                auto &point = MyFrame->PointCloud.At(i, j);
+                if (point.z > 10 && point.z < 10000)
+                    cloud.push_back(pcl::PointXYZ(point.x, point.y, point.z));
+                // cloud.push_back (pcl::PointXYZ (i, j, i+j));
+            }
+        }
+        ROS_INFO("publishing");
+        sensor_msgs::PointCloud2 output;
+        pcl::toROSMsg(cloud, output);
+        output.header.frame_id = "map";
+        pub.publish(output);
+    }
+}
+
+bool get_frame(phoxi_camera::GetFrame::Request &req, phoxi_camera::GetFrame::Response &res){
+    pho::api::PFrame MyFrame = EvaluationScanner->GetFrame(req.in);
+    if(MyFrame){
+        //publish_frame(MyFrame);
+        res.success = true;
+    }
+    else res.success = false;
+    return true;
+}
+
 int main(int argc, char **argv) {
     ROS_INFO("Starting pho_driver ros...");
     ros::init(argc, argv, "phoxi_camera");
-    ros::NodeHandle nh;
-    ros::Publisher pub;
+    ros::NodeHandle nh("~");
 
     dynamic_reconfigure::Server <phoxi_camera::TutorialsConfig> server;
     dynamic_reconfigure::Server<phoxi_camera::TutorialsConfig>::CallbackType f;
+//    f = boost::bind(&callback, boost::ref(EvaluationScanner), _1, _2);
+//    server.setCallback(f);
 //    ros::AsyncSpinner spinner(4); // Use 4 threads
 //    spinner.start();
-    ros::ServiceServer service_get_device_list = nh.advertiseService("get_device_list", get_device_list);
+    ros::ServiceServer service_get_device_list = nh.advertiseService("get_device_list", get_device_list_service);
+    ros::ServiceServer service_connect_camera = nh.advertiseService("connect_camera", connect_camera);
+    ros::ServiceServer service_is_acquiring = nh.advertiseService("is_acquiring", is_acquiring);
+    ros::ServiceServer service_stop_acquisition = nh.advertiseService("stop_acquisition", stop_acquisition);
+    ros::ServiceServer service_trigger_image = nh.advertiseService("trigger_image", trigger_image);
+    ros::ServiceServer service_get_frame = nh.advertiseService("get_frame", get_frame);
     ROS_INFO("Ready");
-    ros::spin();
 //    f = boost::bind(&callback, _1, _2);
 //    server.setCallback(f);
     //LOCAL_CROSS_SLEEP(5000);
     pub = nh.advertise < pcl::PointCloud < pcl::PointXYZ >> ("output", 1);
     int k = 0;
+    ros::spin();
     while (ros::ok()) {
         ROS_INFO("Spin loop");
         LOCAL_CROSS_SLEEP(1000);
@@ -152,8 +275,8 @@ int main(int argc, char **argv) {
             if (EvaluationScanner->isConnected()) {
                 ROS_INFO("Som tam");
                 init_config(EvaluationScanner);
-                f = boost::bind(&callback, boost::ref(EvaluationScanner), _1, _2);
-                server.setCallback(f);
+//                f = boost::bind(&callback, boost::ref(EvaluationScanner), _1, _2);
+//                server.setCallback(f);
                 LOCAL_CROSS_SLEEP(15000);
                 EvaluationScanner->TriggerMode = pho::api::PhoXiTriggerMode::Software;
                 while (EvaluationScanner->GetFrame(0)) {
