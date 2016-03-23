@@ -56,9 +56,9 @@ void init_config(pho::api::PPhoXi &Scanner) {
     ros::param::set("~capturing_size_width", Scanner->CapturingMode->Resolution.Width);
     ros::param::set("~capturing_scan_multiplier", Scanner->CapturingSettings->ScanMultiplier);
     ros::param::set("~acquisition_time", Scanner->AcquisitionTime);
-//    ros::param::set("~trigger_mode", Scanner->TriggerMode);
-    //ros::param::set("~timeout", (int)Scanner->Timeout * -1);
-    //ros::param::set("~processing_settings", Scanner->ProcessingSettings->RequiredConfidence);
+    ros::param::set("~trigger_mode", (pho::api::PhoXiTriggerMode::Value)(pho::api::PhoXiTriggerMode)Scanner->TriggerMode);
+    ros::param::set("~timeout", (int)(pho::api::PhoXiTimeout)Scanner->Timeout);
+    ros::param::set("~processing_settings", Scanner->ProcessingSettings->RequiredConfidence);
 //    ros::param::set("~send_point_cloud", Scanner->OutputSettings->SendPointCloud);
 //    ros::param::set("~send_depth_map", Scanner->OutputSettings->SendDepthMap);
 //    ros::param::set("~send_confidence_map", Scanner->OutputSettings->SendConfidenceMap);
@@ -93,11 +93,19 @@ void callback(pho::api::PPhoXi &Scanner, phoxi_camera::TutorialsConfig &config, 
     if (level & (1 << 6)) {
         Scanner->AcquisitionTime = config.acquisition_time;
     }
+    if (level & (1 << 7)) {
+        Scanner->TriggerMode = config.trigger_mode;
+//        Scanner->TriggerMode = 2;
+    }
+    if (level & (1 << 8)) {
+        Scanner->Timeout = config.timeout;
+//        Scanner->Timeout = -2;
+    }
+    if (level & (1 << 9)) {
+        Scanner->ProcessingSettings->RequiredConfidence = config.processing_settings;
+    }
     std::cout << "koniec callback " << level << std::endl;
     printf("%s%d%s", "\033[", 0, "m");
-//    if (level & (1 << 9)) {
-//        Scanner->ProcessingSettings->RequiredConfidence = config.processing_settings;
-//    }
 //    if (level & (1 << 8)) {
 //        Scanner->Resolution->width = config.size_width;
 //    }
