@@ -70,10 +70,6 @@ void callback(pho::api::PPhoXi &Scanner, phoxi_camera::TutorialsConfig &config, 
     if (EvaluationScanner == 0){
         return;
     }
-//    printf("%s%d%s", "\033[", 31, "m");
-//    std::cout << "level " << level << std::endl;
-//    std::bitset<32> x(level);
-//    std::cout << "bitmask " << x << std::endl;
     if (level & (1 << 1)) {
         Scanner->Resolution->Height = config.size_height;
     }
@@ -113,7 +109,6 @@ void callback(pho::api::PPhoXi &Scanner, phoxi_camera::TutorialsConfig &config, 
     if (level & (1 << 13)) {
         Scanner->OutputSettings->SendTexture = config.send_texture;
     }
-//    printf("%s%d%s", "\033[", 0, "m");
 }
 
 std::vector<pho::api::PhoXiDeviceInformation> get_device_list(){
