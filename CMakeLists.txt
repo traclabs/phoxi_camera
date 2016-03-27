@@ -50,18 +50,23 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
+ add_message_files(
+   FILES
+   PhoXiSize.msg
+ )
 
 ## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
+ add_service_files(
+   FILES
+         GetDeviceList.srv
+         ConnectCamera.srv
+         IsAcquiring.srv
+         GetFrame.srv
+         TriggerImage.srv
+         GetHardwareIdentification.srv
+         GetSupportedCapturingModes.srv
+         IsConnected.srv
+ )
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -71,10 +76,10 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   sensor_msgs#   std_msgs
-# )
+ generate_messages(
+   DEPENDENCIES
+   sensor_msgs std_msgs
+ )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -111,7 +116,8 @@ generate_dynamic_reconfigure_options(
 ## DEPENDS: system dependencies of this project that dependent projects also need
 
 catkin_package(
-#  INCLUDE_DIRS include
+        CATKIN_DEPENDS message_runtime std_msgs sensor_msgs
+        #  INCLUDE_DIRS include
 #  LIBRARIES pho_driver
 #  CATKIN_DEPENDS dynamic_reconfigure pcl_ros roscpp roslib rospy sensor_msgs std_msgs tf
 #  DEPENDS system_lib
@@ -178,6 +184,7 @@ add_dependencies(phoxi_camera_node ${PROJECT_NAME}_gencfg)
 #   ${catkin_LIBRARIES}
 # )
 
+#message(${PHOXI_LIBRARY})
 target_link_libraries(phoxi_camera_node
         debug ${catkin_LIBRARIES}
         optimized ${catkin_LIBRARIES}
@@ -235,7 +242,12 @@ target_link_libraries(phoxi_camera_node
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
 #add dynamic reconfigure api
-#find_package(catkin REQUIRED dynamic_reconfigure)
+find_package(catkin REQUIRED COMPONENTS
+        roscpp
+        rospy
+        std_msgs
+        message_generation
+        )
 
 
 
