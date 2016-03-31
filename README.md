@@ -18,3 +18,4 @@ catkin_make
 rosrun phoxi_camera phoxi_camera_node
 rosrun phoxi_camera phoxi_camera_example.py
 ```
+In phoxi_camera_example.py change hardware identification of camera
