@@ -13,7 +13,7 @@ git init
 git pull https://github.com/photoneo/phoxi_camera.git
 cd ../..
 catkin_make
-source ~/catkin_ws/devel/setup.bash
+source ~/catkin_init_workspace/devel/setup.bash
 catkin_make
 rosrun phoxi_camera phoxi_camera_node
 rosrun phoxi_camera phoxi_camera_example.py
