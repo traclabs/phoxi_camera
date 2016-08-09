@@ -56,10 +56,10 @@ void init_config(pho::api::PPhoXi &Scanner) {
     ros::param::set("~capturing_size_height", Scanner->CapturingMode->Resolution.Height);
     ros::param::set("~capturing_size_width", Scanner->CapturingMode->Resolution.Width);
     ros::param::set("~capturing_scan_multiplier", Scanner->CapturingSettings->ScanMultiplier);
-    ros::param::set("~acquisition_time", Scanner->AcquisitionTime);
+//    ros::param::set("~acquisition_time", Scanner->AcquisitionTime);
     ros::param::set("~trigger_mode", (pho::api::PhoXiTriggerMode::Value)(pho::api::PhoXiTriggerMode)Scanner->TriggerMode);
     ros::param::set("~timeout", (int)(pho::api::PhoXiTimeout)Scanner->Timeout);
-    ros::param::set("~processing_settings", Scanner->ProcessingSettings->RequiredConfidence);
+    ros::param::set("~confidence", Scanner->ProcessingSettings->Confidence);
     ros::param::set("~send_point_cloud", Scanner->OutputSettings->SendPointCloud);
     ros::param::set("~send_depth_map", Scanner->OutputSettings->SendDepthMap);
     ros::param::set("~send_confidence_map", Scanner->OutputSettings->SendConfidenceMap);
@@ -85,9 +85,9 @@ void callback(pho::api::PPhoXi &Scanner, phoxi_camera::TutorialsConfig &config, 
     if (level & (1 << 5)) {
         Scanner->CapturingSettings->ScanMultiplier = config.capturing_scan_multiplier;
     }
-    if (level & (1 << 6)) {
-        Scanner->AcquisitionTime = config.acquisition_time;
-    }
+//    if (level & (1 << 6)) {
+//        Scanner->AcquisitionTime = config.acquisition_time;
+//    }
     if (level & (1 << 7)) {
         Scanner->TriggerMode = config.trigger_mode;
     }
@@ -95,7 +95,7 @@ void callback(pho::api::PPhoXi &Scanner, phoxi_camera::TutorialsConfig &config, 
         Scanner->Timeout = config.timeout;
     }
     if (level & (1 << 9)) {
-        Scanner->ProcessingSettings->RequiredConfidence = config.processing_settings;
+        Scanner->ProcessingSettings->Confidence = config.confidence;
     }
     if (level & (1 << 10)) {
         Scanner->OutputSettings->SendPointCloud = config.send_point_cloud;

@@ -137,21 +137,21 @@ add_compile_options(-pthread)
 ## Your package locations should be listed before other locations
 # include_directories(include)
 #set(BOOST_ROOT /home/msladek/3rdParty_REPO/boost_1_60_0)
-find_package(PhoXi REQUIRED CONFIG PATHS /usr/local/PhoXiControl)
+find_package(PhoXi REQUIRED CONFIG PATHS "$ENV{PHOXI_CONTROL_PATH}")
 
 
-FIND_PACKAGE(Boost REQUIRED COMPONENTS
-        system
-        filesystem
-        thread
-        date_time
-        iostreams
-        serialization
-        chrono
-        atomic
-        regex
-        log
-        )
+#FIND_PACKAGE(Boost REQUIRED COMPONENTS
+#        system
+#        filesystem
+#        thread
+#        date_time
+#        iostreams
+#        serialization
+#        chrono
+#        atomic
+#        regex
+#        log
+#        )
 
 include_directories(
   ${catkin_INCLUDE_DIRS}

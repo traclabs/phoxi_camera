@@ -11,7 +11,7 @@ if __name__ == "__main__":
             get_device_list = rospy.ServiceProxy('phoxi_camera/get_device_list', GetDeviceList)
             resp1 = get_device_list()
             print "devices", resp1.out
-            name = "noConnectedCamera-03"
+            name = "InstalledExamples-PhoXi-example(File3DCamera)"
             res_connect = rospy.ServiceProxy('phoxi_camera/connect_camera', ConnectCamera)(name)
             print "connect to", name, res_connect
             if res_connect.success:
