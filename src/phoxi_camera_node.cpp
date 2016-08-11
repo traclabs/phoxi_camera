@@ -51,11 +51,23 @@ ros::Publisher pub;
 
 void init_config(pho::api::PPhoXi &Scanner) {
     std::cout << "cinit" << std::endl;
-    ros::param::set("~size_height", Scanner->Resolution->Height);
-    ros::param::set("~size_width", Scanner->Resolution->Width);
-    ros::param::set("~capturing_size_height", Scanner->CapturingMode->Resolution.Height);
-    ros::param::set("~capturing_size_width", Scanner->CapturingMode->Resolution.Width);
-    ros::param::set("~capturing_scan_multiplier", Scanner->CapturingSettings->ScanMultiplier);
+//    ros::param::set("~size_height", Scanner->Resolution->Height);
+//    ros::param::set("~size_width", Scanner->Resolution->Width);
+    int idx = 0;
+    std::vector<pho::api::PhoXiCapturingMode> capturingModes = EvaluationScanner->SupportedCapturingModes;
+    for (int i = 0; i < capturingModes.size(); ++i) {
+        if(capturingModes[i] == Scanner->CapturingMode){
+            idx;
+            break;
+        }
+    }
+    if (capturingModes.size() > idx) {
+        EvaluationScanner->CapturingMode = capturingModes[idx];
+    }
+    ros::param::set("~vertical_resolution", idx+1);
+    ros::param::set("~horizontal_resolution", idx+1);
+    ros::param::set("~scan_multiplier", Scanner->CapturingSettings->ScanMultiplier);
+    ros::param::set("~shutter_multiplier", Scanner->CapturingSettings->ShutterMultiplier);
 //    ros::param::set("~acquisition_time", Scanner->AcquisitionTime);
     ros::param::set("~trigger_mode", (pho::api::PhoXiTriggerMode::Value)(pho::api::PhoXiTriggerMode)Scanner->TriggerMode);
     ros::param::set("~timeout", (int)(pho::api::PhoXiTimeout)Scanner->Timeout);
@@ -70,24 +82,37 @@ void callback(pho::api::PPhoXi &Scanner, phoxi_camera::TutorialsConfig &config, 
     if (EvaluationScanner == 0){
         return;
     }
-    if (level & (1 << 1)) {
-        Scanner->Resolution->Height = config.size_height;
-    }
-    if (level & (1 << 2)) {
-        Scanner->Resolution->Width = config.size_width;
-    }
+//    if (level & (1 << 1)) {
+//        Scanner->Resolution->Height = config.size_height;
+//    }
+//    if (level & (1 << 2)) {
+//        Scanner->Resolution->Width = config.size_width;
+//    }
     if (level & (1 << 3)) {
-        Scanner->CapturingMode->Resolution.Height = config.capturing_size_width;
+        std::vector<pho::api::PhoXiCapturingMode> capturingModes = EvaluationScanner->SupportedCapturingModes;
+        if (capturingModes.size() >= config.vertical_resolution) {
+            EvaluationScanner->CapturingMode = capturingModes[config.vertical_resolution - 1];
+            config.horizontal_resolution = config.vertical_resolution;
+        }
+//        Scanner->CapturingMode->Resolution.Height = config.capturing_size_width;
     }
     if (level & (1 << 4)) {
-        Scanner->CapturingMode->Resolution.Width = config.capturing_size_width;
+//        Scanner->CapturingMode->Resolution.Height = config.horizontal_resolution;
+        std::vector<pho::api::PhoXiCapturingMode> capturingModes = EvaluationScanner->SupportedCapturingModes;
+        if (capturingModes.size() >= config.horizontal_resolution) {
+            EvaluationScanner->CapturingMode = capturingModes[config.horizontal_resolution - 1];
+            config.vertical_resolution = config.horizontal_resolution;
+        }
     }
     if (level & (1 << 5)) {
-        Scanner->CapturingSettings->ScanMultiplier = config.capturing_scan_multiplier;
+        Scanner->CapturingSettings->ScanMultiplier = config.scan_multiplier;
     }
 //    if (level & (1 << 6)) {
 //        Scanner->AcquisitionTime = config.acquisition_time;
 //    }
+    if (level & (1 << 6)) {
+        Scanner->CapturingSettings->ShutterMultiplier = config.shutter_multiplier;
+    }
     if (level & (1 << 7)) {
         Scanner->TriggerMode = config.trigger_mode;
     }
