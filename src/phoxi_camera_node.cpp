@@ -4,6 +4,7 @@
 #include <phoxi_camera/TutorialsConfig.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <phoxi_camera/PhoXiSize.h>
+#include <phoxi_camera/FloatImage.h>
 #include <std_srvs/Empty.h>
 #include <phoxi_camera/GetDeviceList.h>
 #include <phoxi_camera/ConnectCamera.h>
@@ -47,7 +48,7 @@
 
 pho::api::PPhoXi EvaluationScanner;
 pho::api::PhoXiFactory Factory;
-ros::Publisher pub_cloud, pub_normals;
+ros::Publisher pub_cloud, pub_normals, pub_confidence_map, pub_texture;
 
 void init_config(pho::api::PPhoXi &Scanner) {
     std::cout << "cinit" << std::endl;
@@ -73,7 +74,7 @@ void init_config(pho::api::PPhoXi &Scanner) {
     ros::param::set("~timeout", (int)(pho::api::PhoXiTimeout)Scanner->Timeout);
     ros::param::set("~confidence", Scanner->ProcessingSettings->Confidence);
     ros::param::set("~send_point_cloud", Scanner->OutputSettings->SendPointCloud);
-    ros::param::set("~send_depth_map", Scanner->OutputSettings->SendDepthMap);
+    ros::param::set("~send_normal_map", Scanner->OutputSettings->SendNormalMap);
     ros::param::set("~send_confidence_map", Scanner->OutputSettings->SendConfidenceMap);
     ros::param::set("~send_texture", Scanner->OutputSettings->SendTexture);
 }
@@ -126,7 +127,7 @@ void callback(pho::api::PPhoXi &Scanner, phoxi_camera::TutorialsConfig &config, 
         Scanner->OutputSettings->SendPointCloud = config.send_point_cloud;
     }
     if (level & (1 << 11)) {
-        Scanner->OutputSettings->SendDepthMap = config.send_depth_map;
+        Scanner->OutputSettings->SendNormalMap = config.send_normal_map;
     }
     if (level & (1 << 12)) {
         Scanner->OutputSettings->SendConfidenceMap = config.send_confidence_map;
@@ -228,8 +229,12 @@ void publish_frame(pho::api::PFrame MyFrame){
         //MyFrame->ConvertTo(MyPCLCloud2);
         //pcl::PLYWriter Writer;
         //Writer.writeBinary("Test Software PCL" + std::to_string(k) + " , " + std::to_string(i) + ".ply", MyPCLCloud2);
-        pcl::PointCloud <pcl::PointXYZ> cloud;
-        pcl::PointCloud <pcl::PointXYZ> normals;
+        pcl::PointCloud <pcl::PointXYZ> cloud, normals;
+        phoxi_camera::FloatImage texture, confidence_map;
+        texture.height = MyFrame->Texture.Size.Height;
+        texture.width = MyFrame->Texture.Size.Width;
+        confidence_map.height = MyFrame->ConfidenceMap.Size.Height;
+        confidence_map.width = MyFrame->ConfidenceMap.Size.Width;
         int h = MyFrame->PointCloud.Size.Height;
         int w = MyFrame->PointCloud.Size.Width;
         for (int i = 0; i < h; ++i) {
@@ -239,6 +244,12 @@ void publish_frame(pho::api::PFrame MyFrame){
                 if (point.z > 0){
                     cloud.push_back(pcl::PointXYZ(point.x, point.y, point.z));
                     normals.push_back(pcl::PointXYZ(point_normal.x, point_normal.y, point_normal.z));
+                }
+                if(i < MyFrame->Texture.Size.Height && j < MyFrame->Texture.Size.Width){
+                    texture.data.push_back(MyFrame->Texture[i][j]);
+                }
+                if(i < MyFrame->ConfidenceMap.Size.Height && j < MyFrame->ConfidenceMap.Size.Width){
+                    confidence_map.data.push_back(MyFrame->ConfidenceMap[i][j]);
                 }
                 // cloud.push_back (pcl::PointXYZ (i, j, i+j));
             }
@@ -251,6 +262,8 @@ void publish_frame(pho::api::PFrame MyFrame){
         output_cloud.header.frame_id = "map";
         pub_cloud.publish(output_cloud);
         pub_normals.publish(output_normals);
+        pub_confidence_map.publish(confidence_map);
+        pub_texture.publish(texture);
     }
 }
 
@@ -304,6 +317,8 @@ int main(int argc, char **argv) {
     ros::ServiceServer service_get_supported_capturing_modes = nh.advertiseService("get_supported_capturing_modes", get_supported_capturing_modes);
     pub_cloud = nh.advertise < pcl::PointCloud < pcl::PointXYZ >> ("pointcloud", 1);
     pub_normals = nh.advertise < pcl::PointCloud < pcl::PointXYZ >> ("normals", 1);
+    pub_confidence_map = nh.advertise < phoxi_camera::FloatImage > ("confidence_map", 1);
+    pub_texture = nh.advertise < phoxi_camera::FloatImage > ("texture", 1);
     ROS_INFO("Ready");
     ros::spin();
     return 0;
