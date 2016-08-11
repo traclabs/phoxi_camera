@@ -47,7 +47,7 @@
 
 pho::api::PPhoXi EvaluationScanner;
 pho::api::PhoXiFactory Factory;
-ros::Publisher pub;
+ros::Publisher pub_cloud, pub_normals;
 
 void init_config(pho::api::PPhoXi &Scanner) {
     std::cout << "cinit" << std::endl;
@@ -229,21 +229,28 @@ void publish_frame(pho::api::PFrame MyFrame){
         //pcl::PLYWriter Writer;
         //Writer.writeBinary("Test Software PCL" + std::to_string(k) + " , " + std::to_string(i) + ".ply", MyPCLCloud2);
         pcl::PointCloud <pcl::PointXYZ> cloud;
+        pcl::PointCloud <pcl::PointXYZ> normals;
         int h = MyFrame->PointCloud.Size.Height;
         int w = MyFrame->PointCloud.Size.Width;
         for (int i = 0; i < h; ++i) {
             for (int j = 0; j < w; ++j) {
                 auto &point = MyFrame->PointCloud.At(i, j);
-                if (point.z > 10 && point.z < 10000)
+                auto &point_normal = MyFrame->NormalMap.At(i, j);
+                if (point.z > 0){
                     cloud.push_back(pcl::PointXYZ(point.x, point.y, point.z));
+                    normals.push_back(pcl::PointXYZ(point_normal.x, point_normal.y, point_normal.z));
+                }
                 // cloud.push_back (pcl::PointXYZ (i, j, i+j));
             }
         }
         ROS_INFO("publishing");
-        sensor_msgs::PointCloud2 output;
-        pcl::toROSMsg(cloud, output);
-        output.header.frame_id = "map";
-        pub.publish(output);
+        sensor_msgs::PointCloud2 output_cloud;
+        sensor_msgs::PointCloud2 output_normals;
+        pcl::toROSMsg(cloud, output_cloud);
+        pcl::toROSMsg(normals, output_normals);
+        output_cloud.header.frame_id = "map";
+        pub_cloud.publish(output_cloud);
+        pub_normals.publish(output_normals);
     }
 }
 
@@ -295,7 +302,8 @@ int main(int argc, char **argv) {
     ros::ServiceServer service_disconnect_camera = nh.advertiseService("disconnect_camera", disconnect_camera);
     ros::ServiceServer service_get_hardware_identification = nh.advertiseService("get_hardware_indentification", get_hardware_identification);
     ros::ServiceServer service_get_supported_capturing_modes = nh.advertiseService("get_supported_capturing_modes", get_supported_capturing_modes);
-    pub = nh.advertise < pcl::PointCloud < pcl::PointXYZ >> ("output", 1);
+    pub_cloud = nh.advertise < pcl::PointCloud < pcl::PointXYZ >> ("pointcloud", 1);
+    pub_normals = nh.advertise < pcl::PointCloud < pcl::PointXYZ >> ("normals", 1);
     ROS_INFO("Ready");
     ros::spin();
     return 0;
