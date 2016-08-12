@@ -3,8 +3,10 @@
 #include <dynamic_reconfigure/server.h>
 #include <phoxi_camera/TutorialsConfig.h>
 #include <sensor_msgs/PointCloud2.h>
+#include <sensor_msgs/Image.h>
+#include <sensor_msgs/image_encodings.h>
+#include <sensor_msgs/fill_image.h>
 #include <phoxi_camera/PhoXiSize.h>
-#include <phoxi_camera/FloatImage.h>
 #include <std_srvs/Empty.h>
 #include <phoxi_camera/GetDeviceList.h>
 #include <phoxi_camera/ConnectCamera.h>
@@ -230,11 +232,30 @@ void publish_frame(pho::api::PFrame MyFrame){
         //pcl::PLYWriter Writer;
         //Writer.writeBinary("Test Software PCL" + std::to_string(k) + " , " + std::to_string(i) + ".ply", MyPCLCloud2);
         pcl::PointCloud <pcl::PointXYZ> cloud, normals;
-        phoxi_camera::FloatImage texture, confidence_map;
-        texture.height = MyFrame->Texture.Size.Height;
-        texture.width = MyFrame->Texture.Size.Width;
-        confidence_map.height = MyFrame->ConfidenceMap.Size.Height;
-        confidence_map.width = MyFrame->ConfidenceMap.Size.Width;
+        sensor_msgs::Image texture, confidence_map;
+        ros::Time       timeNow         = ros::Time::now();
+        std::string     frame           = "camera";
+
+        texture.header.stamp          = timeNow;
+        texture.header.frame_id       = frame;
+
+        confidence_map.header.stamp         = timeNow;
+        confidence_map.header.frame_id      = frame;
+
+        texture.encoding = "32FC1";
+        sensor_msgs::fillImage( texture,
+                                sensor_msgs::image_encodings::TYPE_32FC1,
+                                MyFrame->Texture.Size.Height, // height
+                                MyFrame->Texture.Size.Width, // width
+                                MyFrame->Texture.Size.Width * sizeof(float), // stepSize
+                                MyFrame->Texture.operator[](0));
+        confidence_map.encoding = "32FC1";
+        sensor_msgs::fillImage( confidence_map,
+                                sensor_msgs::image_encodings::TYPE_32FC1,
+                                MyFrame->ConfidenceMap.Size.Height, // height
+                                MyFrame->ConfidenceMap.Size.Width, // width
+                                MyFrame->Texture.Size.Width * sizeof(float), // stepSize
+                                MyFrame->ConfidenceMap.operator[](0));
         int h = MyFrame->PointCloud.Size.Height;
         int w = MyFrame->PointCloud.Size.Width;
         for (int i = 0; i < h; ++i) {
@@ -244,12 +265,6 @@ void publish_frame(pho::api::PFrame MyFrame){
                 if (point.z > 0){
                     cloud.push_back(pcl::PointXYZ(point.x, point.y, point.z));
                     normals.push_back(pcl::PointXYZ(point_normal.x, point_normal.y, point_normal.z));
-                }
-                if(i < MyFrame->Texture.Size.Height && j < MyFrame->Texture.Size.Width){
-                    texture.data.push_back(MyFrame->Texture[i][j]);
-                }
-                if(i < MyFrame->ConfidenceMap.Size.Height && j < MyFrame->ConfidenceMap.Size.Width){
-                    confidence_map.data.push_back(MyFrame->ConfidenceMap[i][j]);
                 }
                 // cloud.push_back (pcl::PointXYZ (i, j, i+j));
             }
@@ -317,8 +332,8 @@ int main(int argc, char **argv) {
     ros::ServiceServer service_get_supported_capturing_modes = nh.advertiseService("get_supported_capturing_modes", get_supported_capturing_modes);
     pub_cloud = nh.advertise < pcl::PointCloud < pcl::PointXYZ >> ("pointcloud", 1);
     pub_normals = nh.advertise < pcl::PointCloud < pcl::PointXYZ >> ("normals", 1);
-    pub_confidence_map = nh.advertise < phoxi_camera::FloatImage > ("confidence_map", 1);
-    pub_texture = nh.advertise < phoxi_camera::FloatImage > ("texture", 1);
+    pub_confidence_map = nh.advertise < sensor_msgs::Image > ("confidence_map", 1);
+    pub_texture = nh.advertise < sensor_msgs::Image > ("texture", 1);
     ROS_INFO("Ready");
     ros::spin();
     return 0;

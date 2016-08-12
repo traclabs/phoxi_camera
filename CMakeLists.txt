@@ -53,7 +53,6 @@ find_package(catkin REQUIRED COMPONENTS
  add_message_files(
    FILES
    PhoXiSize.msg
-   FloatImage.msg
  )
 
 ## Generate services in the 'srv' folder
