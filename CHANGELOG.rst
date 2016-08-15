@@ -2,6 +2,11 @@
 Changelog for package phoxi_camera
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* add gitignore
+* Contributors: Matej Sladek
+
 0.0.1 (2016-08-15)
 ------------------
 * change path to phoxi, remove boost in cmake, rename confidence parameter, remove acquisition_time parameter
