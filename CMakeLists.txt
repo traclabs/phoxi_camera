@@ -159,7 +159,7 @@ include_directories(
 )
 
 ## Declare a C++ library
- add_library(phoxi_camera_node
+ add_library(phoxi_driver
          src/phoxi_camera_node.cpp
  )
 
