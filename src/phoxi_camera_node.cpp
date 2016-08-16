@@ -1,7 +1,7 @@
 #include <ros/ros.h>
 
 #include <dynamic_reconfigure/server.h>
-#include <phoxi_camera/TutorialsConfig.h>
+#include <phoxi_camera/phoxi_cameraConfig.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/image_encodings.h>
@@ -81,7 +81,7 @@ void init_config(pho::api::PPhoXi &Scanner) {
     ros::param::set("~send_texture", Scanner->OutputSettings->SendTexture);
 }
 
-void callback(pho::api::PPhoXi &Scanner, phoxi_camera::TutorialsConfig &config, uint32_t level) {
+void callback(pho::api::PPhoXi &Scanner, phoxi_camera::phoxi_cameraConfig &config, uint32_t level) {
     if (EvaluationScanner == 0){
         return;
     }
@@ -313,8 +313,8 @@ int main(int argc, char **argv) {
     ros::init(argc, argv, "phoxi_camera");
     ros::NodeHandle nh("~");
 
-    dynamic_reconfigure::Server <phoxi_camera::TutorialsConfig> server;
-    dynamic_reconfigure::Server<phoxi_camera::TutorialsConfig>::CallbackType f;
+    dynamic_reconfigure::Server <phoxi_camera::phoxi_cameraConfig> server;
+    dynamic_reconfigure::Server<phoxi_camera::phoxi_cameraConfig>::CallbackType f;
 
     f = boost::bind(&callback, boost::ref(EvaluationScanner), _1, _2);
     server.setCallback(f);
