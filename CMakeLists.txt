@@ -159,9 +159,9 @@ include_directories(
 )
 
 ## Declare a C++ library
- add_library(phoxi_driver
-         src/phoxi_camera_node.cpp
- )
+# add_library(phoxi_driver
+#         src/phoxi_camera_node.cpp
+# )
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -177,7 +177,7 @@ add_executable(phoxi_camera_node src/phoxi_camera_node.cpp)
 ## same as for the library above
 # add_dependencies(pho_driver_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-add_dependencies(phoxi_camera_node ${PROJECT_NAME}_gencfg)
+add_dependencies(phoxi_camera_node ${PROJECT_NAME}_gencfgv ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(pho_driver_node
