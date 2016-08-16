@@ -159,9 +159,9 @@ include_directories(
 )
 
 ## Declare a C++ library
-# add_library(pho_driver
-#   src/${PROJECT_NAME}/pho_driver.cpp
-# )
+ add_library(phoxi_camera_node
+         src/phoxi_camera_node.cpp
+ )
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
