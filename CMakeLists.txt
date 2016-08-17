@@ -189,8 +189,9 @@ target_link_libraries(phoxi_camera_node
         debug ${catkin_LIBRARIES}
         optimized ${catkin_LIBRARIES}
         ${PHOXI_LIBRARY}
-        debug ${Boost_LIBRARIES}
-        optimized ${Boost_LIBRARIES}
+        #debug ${Boost_LIBRARIES}
+        #optimized ${Boost_LIBRARIES}
+        ${Boost_LIBRARIES}
         rt
         )
 
@@ -214,6 +215,19 @@ target_link_libraries(phoxi_camera_node
    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
  )
+
+#message(${PHOXI_LIB_RELEASE_PER_COMPILER}.${PHO_SOFTWARE_VERSION})
+install(FILES ${PHOXI_LIB_RELEASE_PER_COMPILER}.${PHO_SOFTWARE_VERSION}
+        DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}/phoxi_camera
+#        DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+#        DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+        )
+
+install(FILES src/phoxi_camera_example.py
+        DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}/phoxi_camera
+        #        DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        #        DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+        )
 
 ## Mark cpp header files for installation
 # install(DIRECTORY include/${PROJECT_NAME}/
