@@ -259,6 +259,7 @@ void publish_frame(pho::api::PFrame MyFrame){
                                 MyFrame->ConfidenceMap.Size.Width, // width
                                 MyFrame->ConfidenceMap.Size.Width * sizeof(float), // stepSize
                                 MyFrame->ConfidenceMap.operator[](0));
+        normal_map.encoding = "32FC3";
         sensor_msgs::fillImage( normal_map,
                                 sensor_msgs::image_encodings::TYPE_32FC3,
                                 MyFrame->NormalMap.Size.Height, // height
@@ -270,10 +271,7 @@ void publish_frame(pho::api::PFrame MyFrame){
         for (int i = 0; i < h; ++i) {
             for (int j = 0; j < w; ++j) {
                 auto &point = MyFrame->PointCloud.At(i, j);
-                auto &point_normal = MyFrame->NormalMap.At(i, j);
-                if (point.z > 0){
-                    cloud.push_back(pcl::PointXYZ(point.x * 0.001f, point.y * 0.001f, point.z * 0.001f));
-                }
+                cloud.push_back(pcl::PointXYZ(point.x * 0.001f, point.y * 0.001f, point.z * 0.001f));
                 // cloud.push_back (pcl::PointXYZ (i, j, i+j));
             }
         }
