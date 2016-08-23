@@ -209,6 +209,11 @@ target_link_libraries(phoxi_camera_node
 #   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 # )
 
+ install(PROGRAMS src/phoxi_camera_example.py
+   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+ )
+
+
 ## Mark executables and/or libraries for installation
  install(TARGETS phoxi_camera_node
    ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
@@ -219,10 +224,6 @@ target_link_libraries(phoxi_camera_node
 #message(${PHOXI_LIB_RELEASE_PER_COMPILER}.${PHO_SOFTWARE_VERSION})
 install(FILES ${PHOXI_LIB_RELEASE_PER_COMPILER}.${PHO_SOFTWARE_VERSION}
         DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-        )
-
-install(FILES src/phoxi_camera_example.py
-           DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
         )
 
 ## Mark cpp header files for installation
