@@ -263,7 +263,7 @@ void publish_frame(pho::api::PFrame MyFrame){
                 auto &point = MyFrame->PointCloud.At(i, j);
                 auto &point_normal = MyFrame->NormalMap.At(i, j);
                 if (point.z > 0){
-                    cloud.push_back(pcl::PointXYZ(point.x, point.y, point.z));
+                    cloud.push_back(pcl::PointXYZ(point.x * 0.001f, point.y * 0.001f, point.z * 0.001f));
                     normals.push_back(pcl::PointXYZ(point_normal.x, point_normal.y, point_normal.z));
                 }
                 // cloud.push_back (pcl::PointXYZ (i, j, i+j));
