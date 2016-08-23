@@ -2,6 +2,9 @@
 Changelog for package phoxi_camera
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.0.3 (2016-08-16)
 ------------------
 * fix bug
