@@ -19,3 +19,10 @@ rosrun phoxi_camera phoxi_camera_node
 rosrun phoxi_camera phoxi_camera_example.py
 ```
 In phoxi_camera_example.py change hardware identification of camera
+
+Generate package:
+```
+catkin_generate_changelog
+catkin_prepare_release
+bloom-release foo --track indigo --rosdistro indigo
+```
