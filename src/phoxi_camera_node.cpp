@@ -45,7 +45,7 @@
 
 #include <pcl/io/ply_io.h>
 #include <pcl/PCLPointCloud2.h>
-#include <opencv2/opencv.hpp>
+//#include <opencv2/opencv.hpp>
 //#include "Console/PhotoneoConsole.h"
 
 pho::api::PPhoXi EvaluationScanner;
