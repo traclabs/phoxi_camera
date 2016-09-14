@@ -1,5 +1,5 @@
 # phoxi_camera
-if you have not catkin workspace:
+if you don't have catkin workspace:
 ```
 mkdir -p ~/catkin_workspace_directory/src
 cd ~/catkin_workspace_directory/src
