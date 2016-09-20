@@ -21,5 +21,5 @@ Generate package:
 ```
 catkin_generate_changelog
 catkin_prepare_release
-bloom-release foo --track indigo --rosdistro indigo
+bloom-release phoxi_camera --track indigo --rosdistro indigo
 ```
