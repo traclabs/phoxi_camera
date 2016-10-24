@@ -2,8 +2,8 @@
 Changelog for package phoxi_camera
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.1.4 (2016-10-24)
+------------------
 * Update README.md
 * Merge remote-tracking branch 'origin/master'
 * add launch file
