@@ -20,8 +20,8 @@ if __name__ == "__main__":
                 res_get_fram = rospy.ServiceProxy('phoxi_camera/get_frame', GetFrame)(-1)
                 print "get_frame", res_get_fram
             else:
-                print "cant connect"
+                print "can't connect"
         except rospy.ServiceException, e:
             print "Service call failed: %s" % e
         res_dis = rospy.ServiceProxy('phoxi_camera/disconnect_camera', Empty)()
-        print "disconnect"
+        print "disconnected"

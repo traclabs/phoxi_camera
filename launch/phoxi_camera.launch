@@ -1,0 +1,4 @@
+<launch>
+    <node pkg="phoxi_camera" type="phoxi_camera_node" name="phoxi_camera_node" output="screen"/>
+    <node pkg="phoxi_camera" type="phoxi_camera_example.py" name="phoxi_camera_example" output="screen"/>
+</launch>
