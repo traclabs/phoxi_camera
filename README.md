@@ -24,5 +24,6 @@ Generate package:
 ```
 catkin_generate_changelog
 catkin_prepare_release
+# must have git 1.x.x
 bloom-release --rosdistro <ros_distro> --track <ros_distro> phoxi_camera
 ```
