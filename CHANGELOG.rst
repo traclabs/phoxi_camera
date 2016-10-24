@@ -2,6 +2,27 @@
 Changelog for package phoxi_camera
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Update README.md
+* Merge remote-tracking branch 'origin/master'
+* add launch file
+* Update README.md
+* fix
+* fix cmake_minimum_version
+  fix package.xml
+* Update README.md
+* Update README.md
+* Update README.md
+* disable opencv, add pcl to package.xml
+* fix bug
+* Merge remote-tracking branch 'origin/master'
+* fix normal_map
+* change pointcloud values from mm to meters
+* Update README.md
+  add Generate package to README
+* Contributors: Matej Sladek, jzizka
+
 1.1.3 (2016-08-23)
 ------------------
 
