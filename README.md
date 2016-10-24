@@ -1,4 +1,7 @@
 # phoxi_camera
+
+ROS Package for PhoXi Scanner/Camera
+
 if you don't have catkin workspace:
 ```
 mkdir -p ~/catkin_workspace_directory/src
