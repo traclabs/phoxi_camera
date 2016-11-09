@@ -1,13 +1,45 @@
+/*********************************************************************************************//**
+* @file phoxi_camera_node.cpp
+*
+* Copyright (c)
+* Photoneo s.r.o
+* November 2016
+*
+* All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are met:
+*
+* Redistributions of source code must retain the above copyright notice, this
+* list of conditions and the following disclaimer.
+*
+* Redistributions in binary form must reproduce the above copyright notice,
+* this list of conditions and the following disclaimer in the documentation
+* and/or other materials provided with the distribution.
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+* *********************************************************************************************/
+
 #include <ros/ros.h>
 
-#include <dynamic_reconfigure/server.h>
-#include <phoxi_camera/phoxi_cameraConfig.h>
+#include <std_srvs/Empty.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/image_encodings.h>
 #include <sensor_msgs/fill_image.h>
+#include <dynamic_reconfigure/server.h>
+
+#include "PhoXi.h"
+#include <phoxi_camera/phoxi_cameraConfig.h>
 #include <phoxi_camera/PhoXiSize.h>
-#include <std_srvs/Empty.h>
 #include <phoxi_camera/GetDeviceList.h>
 #include <phoxi_camera/ConnectCamera.h>
 #include <phoxi_camera/IsConnected.h>
@@ -19,32 +51,15 @@
 
 //#define PHOXI_PCL_SUPPORT
 
-#include "PhoXi.h"
-#include <string>
-#include <vector>
-#include <iostream>
-
-#if defined(_WIN32)
-#include <windows.h>
-#elif defined (__linux__)
-#include <unistd.h>
-#endif
-
-
-#if defined(_WIN32)
-#define LOCAL_CROSS_SLEEP(Millis) Sleep(Millis)
-#elif defined (__linux__)
 #define LOCAL_CROSS_SLEEP(Millis) usleep(Millis * 1000)
-#endif
 
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl/conversions.h>
 #include <pcl_ros/point_cloud.h>
-//#include <pcl/pcl_conversions.h>
-
 #include <pcl/io/ply_io.h>
 #include <pcl/PCLPointCloud2.h>
+//#include <pcl/pcl_conversions.h>
 //#include <opencv2/opencv.hpp>
 //#include "Console/PhotoneoConsole.h"
 
@@ -184,8 +199,6 @@ bool disconnect_camera(std_srvs::Empty::Request &req, std_srvs::Empty::Response 
     return true;
 }
 
-
-
 bool is_acquiring(phoxi_camera::IsAcquiring::Request &req, phoxi_camera::IsAcquiring::Response &res) {
     res.is_acquiring = EvaluationScanner->isAcquiring();
     return true;
@@ -275,7 +288,7 @@ void publish_frame(pho::api::PFrame MyFrame){
                 // cloud.push_back (pcl::PointXYZ (i, j, i+j));
             }
         }
-        ROS_INFO("publishing");
+        std::cout << "publishing data" << std::endl;
         sensor_msgs::PointCloud2 output_cloud;
         pcl::toROSMsg(cloud, output_cloud);
         output_cloud.header.frame_id = "map";
@@ -313,7 +326,7 @@ bool get_hardware_identification(phoxi_camera::GetHardwareIdentification::Reques
 }
 
 int main(int argc, char **argv) {
-    ROS_INFO("Starting phoxi_camera ros...");
+    std::cout << "Starting phoxi_camera ros...";
     ros::init(argc, argv, "phoxi_camera");
     ros::NodeHandle nh("~");
 
@@ -334,11 +347,13 @@ int main(int argc, char **argv) {
     ros::ServiceServer service_disconnect_camera = nh.advertiseService("disconnect_camera", disconnect_camera);
     ros::ServiceServer service_get_hardware_identification = nh.advertiseService("get_hardware_indentification", get_hardware_identification);
     ros::ServiceServer service_get_supported_capturing_modes = nh.advertiseService("get_supported_capturing_modes", get_supported_capturing_modes);
+
     pub_cloud = nh.advertise < pcl::PointCloud < pcl::PointXYZ >> ("pointcloud", 1);
     pub_normal_map = nh.advertise < sensor_msgs::Image > ("normal_map", 1);
     pub_confidence_map = nh.advertise < sensor_msgs::Image > ("confidence_map", 1);
     pub_texture = nh.advertise < sensor_msgs::Image > ("texture", 1);
-    ROS_INFO("Ready");
+
+    std::cout << "Ready!" << std::endl;
     ros::spin();
     return 0;
 }
