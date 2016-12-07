@@ -32,6 +32,7 @@ add_service_files(
     ConnectCamera.srv
     IsAcquiring.srv
     GetFrame.srv
+    SaveFrame.srv
     TriggerImage.srv
     GetHardwareIdentification.srv
     GetSupportedCapturingModes.srv
