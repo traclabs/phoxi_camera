@@ -46,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <phoxi_camera/IsAcquiring.h>
 #include <phoxi_camera/TriggerImage.h>
 #include <phoxi_camera/GetFrame.h>
+#include <phoxi_camera/SaveFrame.h>
 #include <phoxi_camera/GetHardwareIdentification.h>
 #include <phoxi_camera/GetSupportedCapturingModes.h>
 
@@ -309,6 +310,20 @@ bool get_frame(phoxi_camera::GetFrame::Request &req, phoxi_camera::GetFrame::Res
     return true;
 }
 
+bool save_frame(phoxi_camera::SaveFrame::Request &req, phoxi_camera::SaveFrame::Response &res){
+    pho::api::PFrame MyFrame = EvaluationScanner->GetFrame(req.in);
+    std::cout << "Saving frame to " << req.path << std::endl;
+    if(MyFrame){
+        MyFrame->SaveAsPly(req.path);
+        res.success = true;
+    }
+    else{
+        std::cout << "Failed!" << std::endl;
+        res.success = false;
+    }
+    return true;
+}
+
 bool get_supported_capturing_modes(phoxi_camera::GetSupportedCapturingModes::Request &req, phoxi_camera::GetSupportedCapturingModes::Response &res){
     std::vector<pho::api::PhoXiCapturingMode> vec = EvaluationScanner->SupportedCapturingModes;
     for(int i = 0;i< vec.size();i++){
@@ -344,6 +359,7 @@ int main(int argc, char **argv) {
     ros::ServiceServer service_stop_acquisition = nh.advertiseService("stop_acquisition", stop_acquisition);
     ros::ServiceServer service_trigger_image = nh.advertiseService("trigger_image", trigger_image);
     ros::ServiceServer service_get_frame = nh.advertiseService("get_frame", get_frame);
+    ros::ServiceServer service_save_frame = nh.advertiseService("save_frame", save_frame);
     ros::ServiceServer service_disconnect_camera = nh.advertiseService("disconnect_camera", disconnect_camera);
     ros::ServiceServer service_get_hardware_identification = nh.advertiseService("get_hardware_indentification", get_hardware_identification);
     ros::ServiceServer service_get_supported_capturing_modes = nh.advertiseService("get_supported_capturing_modes", get_supported_capturing_modes);
