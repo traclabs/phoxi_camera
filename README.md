@@ -37,6 +37,7 @@ It is possible to test PhoXi ROS interface without real hardware.
 /phoxi_camera/get_supported_capturing_modes
 /phoxi_camera/is_acquiring
 /phoxi_camera/is_connected
+/phoxi_camera/save_frame
 /phoxi_camera/set_logger_level
 /phoxi_camera/set_parameters
 /phoxi_camera/start_acquisition
