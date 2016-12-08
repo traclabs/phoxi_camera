@@ -312,14 +312,13 @@ bool get_frame(phoxi_camera::GetFrame::Request &req, phoxi_camera::GetFrame::Res
 
 bool save_frame(phoxi_camera::SaveFrame::Request &req, phoxi_camera::SaveFrame::Response &res){
     pho::api::PFrame MyFrame = EvaluationScanner->GetFrame(req.in);
-    std::cout << req.path << std::endl;
+    std::cout << "Saving frame to " << req.path << std::endl;
     if(MyFrame){
-        MyFrame->SaveAsPly(req.path); //"frame.ply");
-        std::cout << "Success" << std::endl;
+        MyFrame->SaveAsPly(req.path);
         res.success = true;
     }
     else{
-        std::cout << "Fail" << std::endl;
+        std::cout << "Failed!" << std::endl;
         res.success = false;
     }
     return true;
