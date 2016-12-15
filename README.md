@@ -2,7 +2,7 @@
 
 This package enables interfacing Photoneo PhoXi 3D Scanner/Camera from ROS. 
 
-<img src="http://www.smartroboticsys.eu/wp-content/uploads/2016/11/photoneo_scanner.png" width="640">
+<img src="http://photoneo.com/images/photoneo_scanner.png" width="640">
 
 ###Install
 *phoxi_camera* package depends on several state-of-the-art libraries and latest version of g++ compiler. Script *install_prerequisities.sh* which is available in main repo folde install all packages and libraries required for successfull phoxi_camera compilation. Follow steps below to get phoxi_camera package working properly on your system: 
@@ -24,7 +24,7 @@ It is possible to test PhoXi ROS interface without real hardware.
 - Notice that pointcloud data are also being published on ROS topics
 - Use available ROS services to control the dummy camera.
 
-<img src="http://www.smartroboticsys.eu/wp-content/uploads/2016/11/PhoXiControl_01.jpg" width="640">
+<img src="http://photoneo.com/images/PhoXiControl_01.jpg" width="640">
 
 ####Available ROS services
 ```
@@ -64,7 +64,7 @@ It is possible to test PhoXi ROS interface without real hardware.
 - Run Interface node ```rosrun phoxi_camera phoxi_camera ```
 - Use available ROS services to control your 3D scanner
 
-<img src=http://www.smartroboticsys.eu/wp-content/uploads/2016/11/PhoXiControl_02.jpg width="640">
+<img src=http://photoneo.com/images/PhoXiControl_02.jpg width="640">
 
 See phoxi_camera [ROS Wiki page](http://wiki.ros.org/phoxi_camera) for further details. 
 
