@@ -67,6 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pho::api::PPhoXi EvaluationScanner;
 pho::api::PhoXiFactory Factory;
 ros::Publisher pub_cloud, pub_normal_map, pub_confidence_map, pub_texture;
+pho::api::PFrame CurrentFrame;
 
 void init_config(pho::api::PPhoXi &Scanner) {
     std::cout << "cinit" << std::endl;
@@ -301,20 +302,23 @@ void publish_frame(pho::api::PFrame MyFrame){
 }
 
 bool get_frame(phoxi_camera::GetFrame::Request &req, phoxi_camera::GetFrame::Response &res){
-    pho::api::PFrame MyFrame = EvaluationScanner->GetFrame(req.in);
-    if(MyFrame){
-        publish_frame(MyFrame);
+    CurrentFrame = EvaluationScanner->GetFrame(req.in);
+    if(CurrentFrame){
+        publish_frame(CurrentFrame);
         res.success = true;
     }
-    else res.success = false;
+    else{
+        std::cout << "Failed!" << std::endl;
+        res.success = false;
+    }
     return true;
 }
 
 bool save_frame(phoxi_camera::SaveFrame::Request &req, phoxi_camera::SaveFrame::Response &res){
-    pho::api::PFrame MyFrame = EvaluationScanner->GetFrame(req.in);
+//    pho::api::PFrame MyFrame = EvaluationScanner->GetFrame(req.in);
     std::cout << "Saving frame to " << req.path << std::endl;
-    if(MyFrame){
-        MyFrame->SaveAsPly(req.path);
+    if(CurrentFrame){
+        CurrentFrame->SaveAsPly(req.path);
         res.success = true;
     }
     else{
