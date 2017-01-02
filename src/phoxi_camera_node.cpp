@@ -77,10 +77,11 @@ void init_config(pho::api::PPhoXi &Scanner) {
     std::vector<pho::api::PhoXiCapturingMode> capturingModes = EvaluationScanner->SupportedCapturingModes;
     for (int i = 0; i < capturingModes.size(); ++i) {
         if(capturingModes[i] == Scanner->CapturingMode){
-            idx;
+            idx=i;
             break;
         }
     }
+    std::cout << "Capture mode: " << idx << std::endl;
     if (capturingModes.size() > idx) {
         EvaluationScanner->CapturingMode = capturingModes[idx];
     }
