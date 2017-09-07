@@ -10,9 +10,8 @@ sudo apt -y install software-properties-common \
 	&& sudo add-apt-repository -y ppa:git-core/ppa \
 	&& sudo apt update \
 	&& sudo apt -y upgrade \
-	&& sudo apt -y install g++ g++-4.9 gcc-4.9 \
-	&& sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.9 60 --slave /usr/bin/g++ g++ /usr/bin/g++-4.9 \
-	&& sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.9 60 --slave /usr/bin/g++ g++ /usr/bin/g++-4.9 \
+	&& sudo apt -y install g++ g++-5 gcc-5 \
+	&& sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 60 --slave /usr/bin/g++ g++ /usr/bin/g++-5 \
 	&& sudo apt -y remove git \
 	&& sudo apt -y install git cmake cmake-curses-gui cmake-qt-gui libgtk2.0-dev pkg-config doxygen graphviz chrpath \
 	libavcodec-dev libavformat-dev libswscale-dev libxt-dev python-numpy \
