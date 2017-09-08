@@ -68,11 +68,13 @@ pho::api::PPhoXi EvaluationScanner;
 pho::api::PhoXiFactory Factory;
 ros::Publisher pub_cloud, pub_normal_map, pub_confidence_map, pub_texture;
 pho::api::PFrame CurrentFrame;
+sensor_msgs::PointCloud2 output_cloud;
 
 void init_config(pho::api::PPhoXi &Scanner) {
     std::cout << "cinit" << std::endl;
 //    ros::param::set("~size_height", Scanner->Resolution->Height);
 //    ros::param::set("~size_width", Scanner->Resolution->Width);
+/*
     int idx = 0;
     std::vector<pho::api::PhoXiCapturingMode> capturingModes = EvaluationScanner->SupportedCapturingModes;
     for (int i = 0; i < capturingModes.size(); ++i) {
@@ -97,6 +99,7 @@ void init_config(pho::api::PPhoXi &Scanner) {
     ros::param::set("~send_normal_map", Scanner->OutputSettings->SendNormalMap);
     ros::param::set("~send_confidence_map", Scanner->OutputSettings->SendConfidenceMap);
     ros::param::set("~send_texture", Scanner->OutputSettings->SendTexture);
+*/
 }
 
 void callback(pho::api::PPhoXi &Scanner, phoxi_camera::phoxi_cameraConfig &config, uint32_t level) {
@@ -193,33 +196,46 @@ bool connect_camera(phoxi_camera::ConnectCamera::Request &req,
 
 bool is_connected(phoxi_camera::IsConnected::Request &req,
                     phoxi_camera::IsConnected::Response &res) {
-    res.connected = EvaluationScanner->isConnected();
+  if (EvaluationScanner==0)
+    return false;
+  res.connected = EvaluationScanner->isConnected();
     return true;
 }
 
 bool disconnect_camera(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res) {
-    EvaluationScanner->Disconnect();
+  if (EvaluationScanner==0)
+    return false;
+  EvaluationScanner->Disconnect();
     return true;
 }
 
 bool is_acquiring(phoxi_camera::IsAcquiring::Request &req, phoxi_camera::IsAcquiring::Response &res) {
-    res.is_acquiring = EvaluationScanner->isAcquiring();
+  if (EvaluationScanner==0)
+    return false;  
+  res.is_acquiring = EvaluationScanner->isAcquiring();
     return true;
 }
 
 bool start_acquisition(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res) {
-    EvaluationScanner->StartAcquisition();
-    return true;
+  if (EvaluationScanner==0)
+    return false;
+  EvaluationScanner->StartAcquisition();
+  return true;
 }
 
 bool stop_acquisition(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res) {
-    EvaluationScanner->StopAcquisition();
-    return true;
+  if (EvaluationScanner==0)
+    return false;
+ 
+  EvaluationScanner->StopAcquisition();
+  return true;
 }
 
 bool trigger_image(phoxi_camera::TriggerImage::Request &req, phoxi_camera::TriggerImage::Response &res){
-    res.success = EvaluationScanner->TriggerImage();
-    return true;
+  if (EvaluationScanner==0)
+    return false;
+  res.success = EvaluationScanner->TriggerImage();
+  return true;
 }
 
 void publish_frame(pho::api::PFrame MyFrame){
@@ -292,7 +308,6 @@ void publish_frame(pho::api::PFrame MyFrame){
             }
         }
         std::cout << "publishing data" << std::endl;
-        sensor_msgs::PointCloud2 output_cloud;
         pcl::toROSMsg(cloud, output_cloud);
         output_cloud.header.frame_id = "map";
         pub_cloud.publish(output_cloud);
@@ -307,9 +322,10 @@ bool get_frame(phoxi_camera::GetFrame::Request &req, phoxi_camera::GetFrame::Res
     if(CurrentFrame){
         publish_frame(CurrentFrame);
         res.success = true;
+        res.cloud = output_cloud;
     }
     else{
-        std::cout << "Failed!" << std::endl;
+      //        std::cout << "Failed!" << std::endl;
         res.success = false;
     }
     return true;
