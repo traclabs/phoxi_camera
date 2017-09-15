@@ -234,6 +234,7 @@ bool stop_acquisition(std_srvs::Empty::Request &req, std_srvs::Empty::Response &
 bool trigger_image(phoxi_camera::TriggerImage::Request &req, phoxi_camera::TriggerImage::Response &res){
   if (EvaluationScanner==0)
     return false;
+  EvaluationScanner->ClearBuffer();
   res.success = EvaluationScanner->TriggerImage();
   return true;
 }
