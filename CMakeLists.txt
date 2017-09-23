@@ -69,7 +69,7 @@ add_executable(
 
 add_dependencies(
   ${PROJECT_NAME}
-  ${PROJECT_NAME}_gencfgv
+  ${PROJECT_NAME}_gencfg
   ${${PROJECT_NAME}_EXPORTED_TARGETS}
   ${catkin_EXPORTED_TARGETS}
 )
