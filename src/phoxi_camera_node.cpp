@@ -264,7 +264,7 @@ void publish_frame(pho::api::PFrame MyFrame){
         //MyFrame->ConvertTo(MyPCLCloud2);
         //pcl::PLYWriter Writer;
         //Writer.writeBinary("Test Software PCL" + std::to_string(k) + " , " + std::to_string(i) + ".ply", MyPCLCloud2);
-        pcl::PointCloud <pcl::PointXYZ> cloud;
+        pcl::PointCloud <pcl::PointXYZI> cloud;
         sensor_msgs::Image texture, confidence_map, normal_map;
         ros::Time       timeNow         = ros::Time::now();
         std::string     frame           = "camera";
@@ -304,7 +304,12 @@ void publish_frame(pho::api::PFrame MyFrame){
         for (int i = 0; i < h; ++i) {
             for (int j = 0; j < w; ++j) {
                 auto &point = MyFrame->PointCloud.At(i, j);
-                cloud.push_back(pcl::PointXYZ(point.x * 0.001f, point.y * 0.001f, point.z * 0.001f));
+                pcl::PointXYZI p;
+                p.x = point.x * 0.001d;
+                p.y = point.y * 0.001d;
+                p.z = point.z * 0.001d;
+                p.intensity = MyFrame->Texture.At(i,j);
+                cloud.push_back(p);
                 // cloud.push_back (pcl::PointXYZ (i, j, i+j));
             }
         }
