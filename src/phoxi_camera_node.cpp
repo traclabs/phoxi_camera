@@ -69,6 +69,7 @@ pho::api::PhoXiFactory Factory;
 ros::Publisher pub_cloud, pub_normal_map, pub_confidence_map, pub_texture;
 pho::api::PFrame CurrentFrame;
 sensor_msgs::PointCloud2 output_cloud;
+sensor_msgs::Image output_img;
 
 void init_config(pho::api::PPhoXi &Scanner) {
     std::cout << "cinit" << std::endl;
@@ -320,6 +321,7 @@ void publish_frame(pho::api::PFrame MyFrame){
         pub_normal_map.publish(normal_map);
         pub_confidence_map.publish(confidence_map);
         pub_texture.publish(texture);
+        output_img = texture;
     }
 }
 
@@ -329,6 +331,7 @@ bool get_frame(phoxi_camera::GetFrame::Request &req, phoxi_camera::GetFrame::Res
         publish_frame(CurrentFrame);
         res.success = true;
         res.cloud = output_cloud;
+        res.img = output_img;
     }
     else{
       //        std::cout << "Failed!" << std::endl;
