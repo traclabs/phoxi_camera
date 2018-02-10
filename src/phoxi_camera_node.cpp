@@ -57,10 +57,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl/conversions.h>
+#include <pcl/common/transforms.h>
 #include <pcl_ros/point_cloud.h>
 #include <pcl/io/ply_io.h>
 #include <pcl/PCLPointCloud2.h>
-//#include <pcl/pcl_conversions.h>
 //#include <opencv2/opencv.hpp>
 //#include "Console/PhotoneoConsole.h"
 
@@ -265,7 +265,7 @@ void publish_frame(pho::api::PFrame MyFrame){
         //MyFrame->ConvertTo(MyPCLCloud2);
         //pcl::PLYWriter Writer;
         //Writer.writeBinary("Test Software PCL" + std::to_string(k) + " , " + std::to_string(i) + ".ply", MyPCLCloud2);
-        pcl::PointCloud <pcl::PointXYZI> cloud;
+        pcl::PointCloud <pcl::PointXYZI> cloud, cloud2;
         sensor_msgs::Image texture, confidence_map, normal_map;
         ros::Time       timeNow         = ros::Time::now();
         std::string     frame           = "camera";
@@ -314,9 +314,15 @@ void publish_frame(pho::api::PFrame MyFrame){
                 // cloud.push_back (pcl::PointXYZ (i, j, i+j));
             }
         }
+	Eigen::Matrix4d m;
+	m << 0.987996,0.00309876,-0.146173,0.727629,0.00436264,-1.00606,0.00310153,-0.00476151,-0.135099,-0.00360368,-0.993006,0.910782,0,0,0,1;
+	//	pcl::transformPointCloud(cloud,cloud2,m);
+	
         std::cout << "publishing data" << std::endl;
         pcl::toROSMsg(cloud, output_cloud);
+	//	pcl::toROSMsg(cloud2, output_cloud);
         output_cloud.header.frame_id = "map";
+	//	output_cloud.header.frame_id = "world";
         pub_cloud.publish(output_cloud);
         pub_normal_map.publish(normal_map);
         pub_confidence_map.publish(confidence_map);
