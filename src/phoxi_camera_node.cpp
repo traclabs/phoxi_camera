@@ -311,18 +311,12 @@ void publish_frame(pho::api::PFrame MyFrame){
                 p.z = point.z * 0.001d;
                 p.intensity = MyFrame->Texture.At(i,j);
                 cloud.push_back(p);
-                // cloud.push_back (pcl::PointXYZ (i, j, i+j));
             }
         }
-	Eigen::Matrix4d m;
-	m << 0.987996,0.00309876,-0.146173,0.727629,0.00436264,-1.00606,0.00310153,-0.00476151,-0.135099,-0.00360368,-0.993006,0.910782,0,0,0,1;
-	//	pcl::transformPointCloud(cloud,cloud2,m);
-	
+
         std::cout << "publishing data" << std::endl;
         pcl::toROSMsg(cloud, output_cloud);
-	//	pcl::toROSMsg(cloud2, output_cloud);
         output_cloud.header.frame_id = "map";
-	//	output_cloud.header.frame_id = "world";
         pub_cloud.publish(output_cloud);
         pub_normal_map.publish(normal_map);
         pub_confidence_map.publish(confidence_map);
