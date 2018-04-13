@@ -70,6 +70,7 @@ ros::Publisher pub_cloud, pub_normal_map, pub_confidence_map, pub_texture;
 pho::api::PFrame CurrentFrame;
 sensor_msgs::PointCloud2 output_cloud;
 sensor_msgs::Image output_img;
+std::string frameId;
 
 void init_config(pho::api::PPhoXi &Scanner) {
     std::cout << "cinit" << std::endl;
@@ -316,7 +317,7 @@ void publish_frame(pho::api::PFrame MyFrame){
 
         std::cout << "publishing data" << std::endl;
         pcl::toROSMsg(cloud, output_cloud);
-        output_cloud.header.frame_id = "map";
+        output_cloud.header.frame_id = frameId;
         pub_cloud.publish(output_cloud);
         pub_normal_map.publish(normal_map);
         pub_confidence_map.publish(confidence_map);
@@ -381,6 +382,7 @@ int main(int argc, char **argv) {
     f = boost::bind(&callback, boost::ref(EvaluationScanner), _1, _2);
     server.setCallback(f);
 
+    nh.param<std::string>("frame_id", frameId, "map");
     ros::ServiceServer service_get_device_list = nh.advertiseService("get_device_list", get_device_list_service);
     ros::ServiceServer service_connect_camera = nh.advertiseService("connect_camera", connect_camera);
     ros::ServiceServer service_is_connected = nh.advertiseService("is_connected", is_connected);
