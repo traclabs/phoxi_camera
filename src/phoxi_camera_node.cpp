@@ -71,6 +71,7 @@ pho::api::PFrame CurrentFrame;
 sensor_msgs::PointCloud2 output_cloud;
 sensor_msgs::Image output_img;
 std::string frameId;
+bool triggered=false;
 
 void init_config(pho::api::PPhoXi &Scanner) {
     std::cout << "cinit" << std::endl;
@@ -233,14 +234,6 @@ bool stop_acquisition(std_srvs::Empty::Request &req, std_srvs::Empty::Response &
   return true;
 }
 
-bool trigger_image(phoxi_camera::TriggerImage::Request &req, phoxi_camera::TriggerImage::Response &res){
-  if (EvaluationScanner==0)
-    return false;
-  EvaluationScanner->ClearBuffer();
-  res.success = EvaluationScanner->TriggerImage();
-  return true;
-}
-
 void publish_frame(pho::api::PFrame MyFrame){
     if (MyFrame) {
         if (!MyFrame->PointCloud.Empty())
@@ -327,18 +320,41 @@ void publish_frame(pho::api::PFrame MyFrame){
 }
 
 bool get_frame(phoxi_camera::GetFrame::Request &req, phoxi_camera::GetFrame::Response &res){
-    CurrentFrame = EvaluationScanner->GetFrame(req.in);
-    if(CurrentFrame){
-        publish_frame(CurrentFrame);
-        res.success = true;
-        res.cloud = output_cloud;
-        res.img = output_img;
-    }
-    else{
-      //        std::cout << "Failed!" << std::endl;
-        res.success = false;
-    }
+  if (EvaluationScanner==0)
+    return false;
+
+  if (!triggered) {
+    res.success=false;
     return true;
+  }
+
+  do {
+    CurrentFrame = EvaluationScanner->GetFrame(req.in);
+  } while (!CurrentFrame);
+
+  triggered=false;
+
+  publish_frame(CurrentFrame);
+  res.success = true;
+  res.cloud = output_cloud;
+  res.img = output_img;
+  return true;
+}
+
+bool trigger_image(phoxi_camera::TriggerImage::Request &req, phoxi_camera::TriggerImage::Response &res){
+  if (EvaluationScanner==0)
+    return false;
+  
+  EvaluationScanner->ClearBuffer();
+  res.success = EvaluationScanner->TriggerImage();
+  triggered=true;
+  if (res.success && req.wait_until_published) {
+    phoxi_camera::GetFrame srv;
+    if (!get_frame(srv.request,srv.response))
+      return false;
+    res.success = srv.response.success;
+  }
+  return true;
 }
 
 bool save_frame(phoxi_camera::SaveFrame::Request &req, phoxi_camera::SaveFrame::Response &res){

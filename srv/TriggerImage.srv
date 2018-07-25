@@ -1,2 +1,3 @@
+bool wait_until_published
 ---
 bool success
