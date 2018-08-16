@@ -311,9 +311,11 @@ void publish_frame(pho::api::PFrame MyFrame){
         std::cout << "publishing data" << std::endl;
         pcl::toROSMsg(cloud, output_cloud);
         output_cloud.header.frame_id = frameId;
+        output_cloud.header.stamp = timeNow;
         pub_cloud.publish(output_cloud);
         pub_normal_map.publish(normal_map);
         pub_confidence_map.publish(confidence_map);
+        texture.header.stamp = timeNow;
         pub_texture.publish(texture);
         output_img = texture;
     }
