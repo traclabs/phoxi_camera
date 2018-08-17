@@ -347,6 +347,9 @@ bool trigger_image(phoxi_camera::TriggerImage::Request &req, phoxi_camera::Trigg
   
   EvaluationScanner->ClearBuffer();
   res.success = EvaluationScanner->TriggerImage();
+  // sometimes the first doesn't trigger
+  if (!res.success)
+    res.success = EvaluationScanner->TriggerImage();
   triggered=true;
   if (res.success && req.wait_until_published) {
     phoxi_camera::GetFrame srv;
