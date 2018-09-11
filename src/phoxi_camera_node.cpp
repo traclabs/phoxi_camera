@@ -339,7 +339,6 @@ bool get_frame(phoxi_camera::GetFrame::Request &req, phoxi_camera::GetFrame::Res
   publish_frame(CurrentFrame);
   res.success = true;
   res.cloud = output_cloud;
-  res.img = output_img;
   return true;
 }
 
