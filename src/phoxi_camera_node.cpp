@@ -77,7 +77,7 @@ void init_config(pho::api::PPhoXi &Scanner) {
     std::cout << "cinit" << std::endl;
 //    ros::param::set("~size_height", Scanner->Resolution->Height);
 //    ros::param::set("~size_width", Scanner->Resolution->Width);
-/*
+
     int idx = 0;
     std::vector<pho::api::PhoXiCapturingMode> capturingModes = EvaluationScanner->SupportedCapturingModes;
     for (int i = 0; i < capturingModes.size(); ++i) {
@@ -102,7 +102,7 @@ void init_config(pho::api::PPhoXi &Scanner) {
     ros::param::set("~send_normal_map", Scanner->OutputSettings->SendNormalMap);
     ros::param::set("~send_confidence_map", Scanner->OutputSettings->SendConfidenceMap);
     ros::param::set("~send_texture", Scanner->OutputSettings->SendTexture);
-*/
+
 }
 
 void callback(pho::api::PPhoXi &Scanner, phoxi_camera::phoxi_cameraConfig &config, uint32_t level) {
