@@ -330,9 +330,11 @@ bool get_frame(phoxi_camera::GetFrame::Request &req, phoxi_camera::GetFrame::Res
     return true;
   }
 
-  do {
+  CurrentFrame = EvaluationScanner->GetFrame(req.in);
+  while (!CurrentFrame) {
+    ros::Duration(0.01).sleep();
     CurrentFrame = EvaluationScanner->GetFrame(req.in);
-  } while (!CurrentFrame);
+  } 
 
   triggered=false;
 
