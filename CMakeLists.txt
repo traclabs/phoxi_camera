@@ -4,6 +4,8 @@ set(CMAKE_CXX_COMPILER "g++")
 
 project(phoxi_camera)
 
+set(CMAKE_CXX_STANDARD 14)
+
 find_package(PhoXi REQUIRED CONFIG PATHS "$ENV{PHOXI_CONTROL_PATH}")
 
 find_package(catkin REQUIRED
