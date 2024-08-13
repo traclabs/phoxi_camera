@@ -144,7 +144,7 @@ add_dependencies(
 
 target_link_libraries(
   ${PROJECT_NAME}_PhoXi_Interface
-  ${PHOXI_LIBRARY}
+  ${PHOXI_LIB_DEBUG}  # We don't use ${PHOXI_LIBRARY} because we have crashing issues in docker.
   rt
   pthread
 )
